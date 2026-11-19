@@ -134,6 +134,7 @@ public class Home extends Activity {
         }
         if (tabs() && state == null) tab = 0;
         setContentView(withNav(sv));
+        if (!MINIMAL_MODE) {
         Warp.listeners.add(warpChanged);
 
         // Once per install: an update from a version with built-in sources gets them added (Sources.migrate), then a notice
@@ -149,6 +150,7 @@ public class Home extends Activity {
         Warp.whenSettled(() -> App.io.execute(Iptv::sweep));
         // A newer release on GitHub shows as a line on Home
         if (Update.due()) App.io.execute(() -> { if (Update.check()) runOnUiThread(this::build); });   // GitHub's API is open: no waiting for WARP
+        }
     }
 
     @Override protected void onResume() {
