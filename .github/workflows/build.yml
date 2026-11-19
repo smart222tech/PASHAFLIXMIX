@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'feature/pasha-minimal-player']
   pull_request:
   workflow_dispatch:
 
@@ -52,12 +52,12 @@ jobs:
 
       - name: Check the APKs
         run: |
-          for f in AnantPlay-*.apk; do
+          for f in PashaFlixMix-*.apk; do
             "$ANDROID_HOME"/build-tools/35.0.0/apksigner verify --print-certs "$f" | grep -E "Signer #1 certificate (DN|SHA-256)"
           done
 
       - uses: actions/upload-artifact@v4
         with:
           name: apks
-          path: AnantPlay-*.apk
+          path: PashaFlixMix-*.apk
           if-no-files-found: error
