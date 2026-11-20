@@ -17,10 +17,12 @@ The catalog, IPTV, sports, downloads, casting, VPN/WARP startup, source director
 
 ## Build
 
-GitHub Actions builds separate APKs for Android phones and Android TV / Fire TV.
+GitHub Actions builds separate APKs for Android phones and Android TV / Fire TV whenever changes are pushed to `main` or `feature/pasha-minimal-player`, and for pull requests.
 
 - `PashaFlixMix-Android-v*.apk`
 - `PashaFlixMix-TV-v*.apk`
+
+After a successful run, download the `apks` artifact from the run's **Artifacts** section.
 
 The build uses the Android SDK, JDK 17 and the included WARP helper build required by retained upstream networking classes.
 
