@@ -54,7 +54,6 @@ public class App extends Application {
         super.onCreate();
         app = this;
         prefs = getSharedPreferences("fmhyplay", MODE_PRIVATE);   // the name from before the rename: changing it would wipe everyone's settings
-        Update.schedule(this, false);   // the hourly check, with the app closed too
         // A new version may read things the kept brand file (6 hours) does not have yet: after an update it is fetched again
         try {
             long updated = getPackageManager().getPackageInfo(getPackageName(), 0).lastUpdateTime;
@@ -80,40 +79,8 @@ public class App extends Application {
         // v2.1 makes the cursor the default way to browse a site: switch it on once for people updating from 2.0
         if (!prefs.getBoolean("cursorDefault21", false)) prefs.edit().putBoolean("pointer", true).putBoolean("cursorDefault21", true).apply();
 
-        if (prefs.getBoolean("warp", true)) Warp.start();
         io.execute(AdBlock::load);
-        // The TV listens for casts from phones (not in the WebView's sandboxed processes, which also start an App)
-        if (android.os.Build.VERSION.SDK_INT < 28 || getPackageName().equals(getProcessName())) {
-            if (tv) Cast.start(this);
-            else Cast.discover(this, () -> main.post(() -> { if (PlayerActivity.current != null) PlayerActivity.current.refreshChips(); }));   // TVs to cast to, ready before the player opens
-        }
+        // Minimal build: no casting, VPN/WARP or background activity services.
 
-        // No screen of ours visible for 2 minutes: stop WARP (no keepalive traffic in the background), restart on return
-        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
-            int visible;
-            final Runnable idleStop = new Runnable() {
-                @Override public void run() {
-                    if (visible != 0 || Warp.state != Warp.State.ON) return;
-                    if (Downloads.active() > 0) { main.postDelayed(this, 60000); return; }   // a download still needs it: look again in a minute
-                    Warp.pause();
-                }
-            };
-
-            @Override public void onActivityStarted(Activity a) {
-                visible++;
-                main.removeCallbacks(idleStop);
-                if (prefs.getBoolean("warp", true) && Warp.state == Warp.State.OFF) Warp.start();
-            }
-
-            @Override public void onActivityStopped(Activity a) {
-                if (--visible == 0) main.postDelayed(idleStop, 120000);
-            }
-
-            @Override public void onActivityCreated(Activity a, Bundle b) { }
-            @Override public void onActivityResumed(Activity a) { }
-            @Override public void onActivityPaused(Activity a) { }
-            @Override public void onActivitySaveInstanceState(Activity a, Bundle b) { }
-            @Override public void onActivityDestroyed(Activity a) { }
-        });
     }
 }

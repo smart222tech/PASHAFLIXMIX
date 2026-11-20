@@ -41,6 +41,8 @@ import java.util.Map;
 
 /** Start screen: Continue watching, then the sources' streaming sites by category, then the user's own sites. */
 public class Home extends Activity {
+    // PashaFlixMix keeps only the user's saved websites and the built-in browser/player.
+    static final boolean MINIMAL_MODE = true;
     // One accent, kept for play and progress; everything else is ink, two card tones and two text tones
     static final int BG = 0xFF0E0C13, CARD = 0xFF1A1721, CARD_HI = 0xFF282431, NAV = 0xFF131019, ACCENT = 0xFFFF3B5C, TEXT = 0xFFF4F2F7, MUTED = 0xFF9690A3;
     // Decoded pictures: a sixth of the app's memory (it was a fixed 24 MB, about 17 posters, so scrolling back decoded them all again)
@@ -132,6 +134,7 @@ public class Home extends Activity {
         }
         if (tabs() && state == null) tab = 0;
         setContentView(withNav(sv));
+        if (!MINIMAL_MODE) {
         Warp.listeners.add(warpChanged);
 
         // Once per install: an update from a version with built-in sources gets them added (Sources.migrate), then a notice
@@ -147,6 +150,7 @@ public class Home extends Activity {
         Warp.whenSettled(() -> App.io.execute(Iptv::sweep));
         // A newer release on GitHub shows as a line on Home
         if (Update.due()) App.io.execute(() -> { if (Update.check()) runOnUiThread(this::build); });   // GitHub's API is open: no waiting for WARP
+        }
     }
 
     @Override protected void onResume() {
@@ -367,6 +371,7 @@ public class Home extends Activity {
      * a phone the tabs along the bottom, and on the tab screens the top bar. A page on top of the tabs (title, search, a list) goes Home on a tab press.
      */
     View withNav(View content) {
+        if (MINIMAL_MODE) return content;
         tabViews.clear();
         tabBar = tabBar();
         LinearLayout root = new LinearLayout(this);
@@ -406,7 +411,8 @@ public class Home extends Activity {
         cardW = App.tv ? 220 : 156;   // a site grid on another tab resizes the shared card width
         cardH = App.tv ? 92 : 62;
         styleTabs();
-        switch (tab) {
+        if (MINIMAL_MODE) buildMinimalHome();
+        else switch (tab) {
             case 0: buildHome(); sourcesNotice(); break;
             case 1: catalogTab("movie", Cats.MOVIES, ""); break;
             case 2: catalogTab("series", Cats.TV, ""); break;
@@ -420,6 +426,57 @@ public class Home extends Activity {
         if (App.tv && first != null && !skipFocus) {
             if (!first.requestFocus()) col.post(first::requestFocus);
             col.setFocusable(false);   // it only held the focus while the page was empty (selectTab)
+        }
+    }
+
+    /** Minimal PashaFlixMix home: saved websites only. The original WebView, ad blocker, sniffer and native player remain untouched. */
+    void buildMinimalHome() {
+        int widthDp = Math.round(getResources().getDisplayMetrics().widthPixels / getResources().getDisplayMetrics().density);
+        cardW = Math.max(220, Math.min(560, widthDp - side * 2));
+        cardH = App.tv ? 84 : 72;
+        gapDp = App.tv ? 12 : 8;
+
+        TextView brand = text("PASHA FLIX MIX", sp(28, 23), TEXT, true);
+        brand.setPadding(0, dp(12), 0, dp(4));
+        col.addView(brand);
+
+        TextView subtitle = text("Your streaming websites in one place", sp(15, 13), MUTED, false);
+        subtitle.setPadding(0, 0, 0, dp(18));
+        col.addView(subtitle);
+
+        TextView add = text("+  Add website", sp(18, 16), Color.WHITE, true);
+        add.setGravity(Gravity.CENTER);
+        add.setLayoutParams(new LinearLayout.LayoutParams(-1, dp(App.tv ? 62 : 54)));
+        add.setBackground(rounded(ACCENT, dp(14)));
+        focusable(add, dp(14));
+        add.setOnClickListener(v -> addSiteDialog());
+        col.addView(add);
+        if (firstCard == null) firstCard = add;
+
+        TextView section = text("MY WEBSITES", sp(13, 12), MUTED, true);
+        section.setPadding(0, dp(24), 0, dp(10));
+        col.addView(section);
+
+        List<Sites.Site> saved = Sites.favorites();
+        if (saved.isEmpty()) {
+            TextView empty = text("Add a website address above. Your saved pages will appear here.", sp(15, 13), MUTED, false);
+            empty.setPadding(0, dp(8), 0, dp(12));
+            col.addView(empty);
+        } else {
+            for (Sites.Site site : saved) {
+                View card = siteCard(site, false);
+                card.setLayoutParams(new LinearLayout.LayoutParams(-1, dp(cardH)));
+                card.setOnLongClickListener(v -> {
+                    new AlertDialog.Builder(this).setTitle(site.name)
+                        .setMessage("Remove this website from your saved list?")
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .setPositiveButton("Remove", (d, w) -> { Sites.toggleFavorite(site); build(); })
+                        .show();
+                    return true;
+                });
+                col.addView(card);
+                if (firstCard == null) firstCard = card;
+            }
         }
     }
 

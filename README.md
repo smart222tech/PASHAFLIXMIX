@@ -1,68 +1,37 @@
-<p align="center">
-  <img src="docs/banner.png" alt="AnantPlay" width="560">
-</p>
+# PASHA FLIX MIX
 
-<p align="center">
-  <b>Any streaming site, a real player.</b><br>
-  A TV-first Android app that opens the sites you choose, finds the video they play, and plays it in a native player.
-</p>
+A minimal Android / Android TV / Fire TV browser-to-player app.
 
-<p align="center">
-  <a href="https://github.com/AnantPlay/android/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/AnantPlay/android?color=ff3b5c"></a>
-  <a href="https://github.com/AnantPlay/android/actions/workflows/build.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/AnantPlay/android/build.yml?branch=main"></a>
-  <img alt="Android 8.0+" src="https://img.shields.io/badge/Android-8.0%2B-3ddc84">
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
-</p>
+## What this fork keeps
 
-<p align="center">
-  <a href="https://github.com/AnantPlay/android/releases/latest">Download</a> ·
-  <a href="https://anantplay.github.io/android/">Documentation</a> ·
-  <a href="https://anantplay.github.io/android/guide.html">User guide</a> ·
-  <a href="https://buymeacoffee.com/rohit267">Support</a>
-</p>
+- A home screen with only user-added streaming websites.
+- Add a website by entering its URL; saved websites remain on the home screen.
+- An embedded WebView browser with the upstream ad and pop-up blocking implementation.
+- TV remote pointer / air-mouse navigation and touchscreen support.
+- Automatic stream detection and hand-off to the built-in native video player.
+- Full-screen playback using the upstream Media3-based player.
 
-<p align="center">
-  <img src="docs/screenshots/player.jpg" alt="AnantPlayer" width="760">
-</p>
+## What this fork hides or disables
 
-## What it does
-
-- Plays the stream a site starts in a hardware-accelerated player, with the site's servers, qualities, episodes and Sub / Dub as player buttons
-- Works with a TV remote and with touch; blocks ads and pop-ups
-- Resumes where you stopped on any site, skips intros, finds subtitles in any language
-- Downloads movies and episodes (HLS and DASH) as seekable MP4 files
-- Casts from the phone to a TV (AnantPlay, Chromecast or DLNA); the phone becomes the remote
-- IPTV from playlists, Xtream Codes or Stalker portals you add
-- Optional in-app Cloudflare WARP, no VPN permission, no root
-- Ships with no sites or channels: you add sources in *Settings, Sources*. No account, no analytics
-
-Everything else is in the [user guide](https://anantplay.github.io/android/guide.html).
-
-## Install
-
-From [Releases](https://github.com/AnantPlay/android/releases/latest): `AnantPlay-TV-vX.Y.Z.apk` for Android TV, Google TV, Fire TV and boxes, `AnantPlay-Android-vX.Y.Z.apk` for phones and tablets. Android 8.0 or newer. The app updates itself.
-
-**Fire TV:** turn on developer options (*Settings → My Fire TV → About*, press the device name 7 times), install **Downloader**, allow it under *Developer options → Install unknown apps*, then enter the code **`6664733`**.
-
-Every APK is built from this repository by GitHub Actions; check yours against `SHA256SUMS.txt` in the release.
+The catalog, IPTV, sports, downloads, casting, VPN/WARP startup, source directories, account-like extras and general settings are not part of the minimal home experience. The underlying upstream code is retained where needed by the browser and native player.
 
 ## Build
 
-```sh
-warp/build.sh   # WARP helper (Go, Android NDK)
-./build.sh      # Android SDK 34, JDK 17+
-```
+GitHub Actions builds separate APKs for Android phones and Android TV / Fire TV whenever changes are pushed to `main` or `feature/pasha-minimal-player`, and for pull requests.
 
-Details in the [build guide](https://anantplay.github.io/android/build.html).
+- `PashaFlixMix-Android-v*.apk`
+- `PashaFlixMix-TV-v*.apk`
 
-## Support
+After a successful run, download the `apks` artifact from the run's **Artifacts** section.
 
-AnantPlay is free and made in spare time. If it is useful to you: [Buy me a coffee](https://buymeacoffee.com/rohit267) or [PayPal](https://paypal.me/champdev).
+The build uses the Android SDK, JDK 17 and the included WARP helper build required by retained upstream networking classes.
 
-## Legal
+## Notes
 
-AnantPlay is a browser and a media player. It hosts no video and ships no list of streams; the sources you add and what they serve belong to third parties, and what you watch is your responsibility. Components and data sources are listed in [THIRD_PARTY.md](THIRD_PARTY.md).
+This app is a browser and media player. It does not host, supply or endorse third-party video sources. Users are responsible for the websites they choose to visit and for complying with applicable law and each site's terms.
 
-## License
+The browser's ad filtering is based on domain blocklists and browser-side protections. No blocker can guarantee removal of every advertisement or pop-up on every website. Some websites use DRM, encrypted streams or custom playback systems that may not be available to the native player.
 
-[MIT](LICENSE)
+## Upstream
+
+Based on the AnantPlay Android project. See the upstream repository and its license for third-party notices and component attribution.
