@@ -17,12 +17,13 @@ The catalog, IPTV, sports, downloads, casting, VPN/WARP startup, source director
 
 ## Build
 
-GitHub Actions builds separate APKs for Android phones and Android TV / Fire TV whenever changes are pushed to `main` or `feature/pasha-minimal-player`, and for pull requests.
+GitHub Actions builds three APKs whenever changes are pushed to `main`, `feature/pasha-minimal-player` or `feature/universal-apk`, and for pull requests.
 
-- `PashaFlixMix-Android-v*.apk`
-- `PashaFlixMix-TV-v*.apk`
+- `PashaFlixMix-Android-v*.apk` — phone/tablet launcher.
+- `PashaFlixMix-TV-v*.apk` — Android TV / Fire TV launcher.
+- `PashaFlixMix-Universal-v*.apk` — one APK with both phone and TV launchers, containing ARM64 (`arm64-v8a`) and ARMv7 (`armeabi-v7a`) native libraries.
 
-After a successful run, download the `apks` artifact from the run's **Artifacts** section.
+After a successful run, download the `apks` artifact from the run's **Artifacts** section. The universal build is intended for ARM-based Android phones and Fire TV devices; it does not add x86 emulator support.
 
 The build uses the Android SDK, JDK 17 and the included WARP helper build required by retained upstream networking classes.
 
