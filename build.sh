@@ -1,5 +1,5 @@
 #!/bin/sh
-# Builds PashaFlixMix-TV-v<version>.apk and PashaFlixMix-Android-v<version>.apk with plain SDK tools (no Gradle).
+# Builds TV, Android-phone and Universal PashaFlixMix APKs with plain SDK tools (no Gradle).
 # Needs: an Android SDK (platform 34 + build-tools), a JDK 17+, and the WARP helper built once with warp/build.sh (needs Go).
 # Env: ANDROID_HOME, VERSION_NAME, VERSION_CODE, TEST_EXPORT=1 (emulator test build), DEBUG_TV=1 (TV build with web inspection, for a real TV).
 # TV: Android TV launcher + banner, remote navigation with the cursor on by default.  Android: phone/tablet launcher, touch.
@@ -60,3 +60,5 @@ fi
 rm -f PashaFlixMix*.apk
 pack tv AndroidManifest.xml PashaFlixMix-TV-v$VERSION_NAME.apk
 pack android build/AndroidManifest-android.xml PashaFlixMix-Android-v$VERSION_NAME.apk
+# One installable package for both phone and TV launchers. The native WARP helper includes ARM64 and ARMv7 libraries.
+pack universal AndroidManifest.xml PashaFlixMix-Universal-v$VERSION_NAME.apk
